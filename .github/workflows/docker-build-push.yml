@@ -49,7 +49,7 @@ jobs:
         kubectl apply --dry-run=client -f k8s/namespace.yaml
         kubectl apply --dry-run=client -f k8s/deployment.yaml
         kubectl apply --dry-run=client -f k8s/service.yaml
-
+    #Bonus from doc
     - name: Validate Terraform configuration
       run: |
         terraform init
