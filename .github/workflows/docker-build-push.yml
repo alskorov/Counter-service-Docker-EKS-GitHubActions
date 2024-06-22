@@ -68,7 +68,7 @@ jobs:
     # Validate Kubernetes YAML files
     - name: Validate Kubernetes YAML files
       run: |
-        kubectl apply --dry-run=client -f k8s/namespace.yaml
+        kubectl apply --dry-run=client -f k8s/namespaces.yaml
         kubectl apply --dry-run=client -f k8s/deployment.yaml
         kubectl apply --dry-run=client -f k8s/service.yaml
 
