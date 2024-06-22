@@ -13,6 +13,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    # Configure AWS credentials for the GitHub Actions environment
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -20,12 +21,14 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
+    # Login to Amazon ECR using the configured AWS credentials and region
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
       env:
         AWS_REGION: ${{ secrets.AWS_REGION }}
 
+    # Build, tag, and push the Docker image to Amazon ECR
     - name: Build, tag, and push image to Amazon ECR
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -36,18 +39,21 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+    # Install kubectl for Kubernetes management
     - name: Install kubectl
       run: |
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
         chmod +x ./kubectl
         sudo mv ./kubectl /usr/local/bin/kubectl
 
+    # Setup AWS CLI
     - name: Setup AWS CLI
       run: |
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
         unzip awscliv2.zip
         sudo ./aws/install
 
+    # Configure kubectl to use the EKS cluster
     - name: Configure kubectl
       env:
         AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -56,17 +62,20 @@ jobs:
       run: |
         aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name <eks-cluster-name>
 
+    # Validate Kubernetes YAML files
     - name: Validate Kubernetes YAML files
       run: |
         kubectl apply --dry-run=client -f k8s/namespace.yaml
         kubectl apply --dry-run=client -f k8s/deployment.yaml
         kubectl apply --dry-run=client -f k8s/service.yaml
 
+    # Bonus: Validate Terraform configuration
     - name: Validate Terraform configuration
       run: |
         terraform init
         terraform validate
 
+    # Deploy the application to Kubernetes
     - name: Deploy to Kubernetes
       run: |
         kubectl apply -f k8s/namespace.yaml
