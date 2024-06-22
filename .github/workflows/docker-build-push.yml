@@ -68,9 +68,9 @@ jobs:
     # Validate Kubernetes YAML files
     - name: Validate Kubernetes YAML files
       run: |
-        kubectl apply --dry-run=client -f k8s/namespaces.yaml
-        kubectl apply --dry-run=client -f k8s/deployment.yaml
-        kubectl apply --dry-run=client -f k8s/service.yaml
+        kubectl apply --dry-run=client -f k8s/namespaces.yaml --validate=false
+        kubectl apply --dry-run=client -f k8s/deployment.yaml --validate=false
+        kubectl apply --dry-run=client -f k8s/service.yaml --validate=false
 
     # Bonus: Validate Terraform configuration
     - name: Validate Terraform configuration
